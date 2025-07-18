@@ -8,6 +8,6 @@ Create local .env file with keys required by config.py model.
 
 ```
 uv run --env-file .env python scrape.py
-uv run --env-file .env python compare.py <folder1> <folder2>
-uv run --env-file .env python send_email.py <folder>
+uv run --env-file .env python compare.py <results/old_dir> <results/new_dir>
+uv run --env-file .env python send_email.py <results/exports/new_dir>
 ```
