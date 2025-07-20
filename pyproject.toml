@@ -22,4 +22,6 @@ dependencies = [
     "requests>=2.32.4",
     "tqdm>=4.67.1",
     "pre-commit>=4.2.0",
+    "colorama>=0.4.6",
+    "lief>=0.16.6",
 ]

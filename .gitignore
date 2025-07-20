@@ -1,6 +1,8 @@
 # project-specific
 results/*
 _testscripts/
+ipinfo_results.json
+todo.md
 
 # google APIs
 credentials.json
