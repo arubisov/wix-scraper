@@ -7,6 +7,7 @@ import logging
 from datetime import datetime
 from pathlib import Path
 
+import requests
 from jinja2 import BaseLoader, Environment
 from openai import OpenAI
 from tenacity import retry, stop_after_attempt, wait_random_exponential
@@ -50,6 +51,29 @@ def prepend_summary_to_file(filepath: str, summary: str) -> None:
         f.write(summary + "\n\n### Detailed changes\n\n" + original_content)
 
 
+def push_summary_to_signal(message: str) -> None:
+    health_url = "http://localhost:8080/v1/health"
+    send_url = "http://localhost:8080/v2/send"
+    try:
+        resp = requests.get(health_url)
+        resp.raise_for_status()
+    except Exception as e:
+        lgg.er(f"Signal API health check failed: {e}")
+        return
+
+    payload = {
+        "message": message,
+        "number": settings.signal_number,
+        "recipients": settings.signal_recipients,
+    }
+    try:
+        resp = requests.post(send_url, json=payload, headers={"Content-Type": "application/json"})
+        resp.raise_for_status()
+        lgg.i("Summary pushed to Signal API successfully.")
+    except Exception as e:
+        lgg.er(f"Failed to push summary to Signal API: {e}")
+
+
 def main(filepath: str, from_date: str, to_date: str) -> None:
     with open(filepath, "r") as f:
         text = f.read()
@@ -60,7 +84,10 @@ def main(filepath: str, from_date: str, to_date: str) -> None:
         {"FROM_DATE": from_date, "TO_DATE": to_date}
     )
 
-    prepend_summary_to_file(filepath, preamble + summary)
+    full_summary = preamble + summary
+
+    prepend_summary_to_file(filepath, full_summary)
+    push_summary_to_signal(full_summary)
 
 
 if __name__ == "__main__":

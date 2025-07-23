@@ -63,6 +63,7 @@ async def main():
         async def handle_response(res: Response):
             ctype = res.headers.get("content-type", "")
             if "application/pdf" in ctype.lower():
+                logging.info(f"{res.url=}")
                 await pdf_queue.put(res.url)
 
         context.on("response", handle_response)
@@ -73,6 +74,7 @@ async def main():
                 if not url or url in visited or url in URL_BLACKLIST:
                     continue
                 visited.add(url)
+                logging.info(f"{url=}")
                 async with sem:
                     if url.lower().endswith(".pdf"):
                         await pdf_queue.put(url)

@@ -16,6 +16,9 @@ class Settings(BaseSettings):
     token_file: str = "token.json"
     openai_api_key: str = ""
     openai_model_version: str = "gpt-4o-mini"
+    # phone number to send from, and list of Signal recipient IDs
+    signal_number: str
+    signal_recipients: list[str] = []
 
     class Config:
         env_file = ".env"
